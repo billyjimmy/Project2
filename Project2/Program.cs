@@ -68,7 +68,7 @@
             public Tokeniser(string expression) { //Don't really need a constructor
                 SetExpression(expression);
             }
-            //test git
+            
             string expression;
             int pointer = 0;
             const string numbers = "1234567890";
@@ -88,6 +88,7 @@
                 //If is a single-char token, like a bracket, return.
                 if (singles.Contains(token))
                 {
+                    pointer++;
                     return token;
                 }
 
