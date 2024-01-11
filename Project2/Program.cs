@@ -15,7 +15,7 @@ namespace project2
             Tokeniser tokeniser;
             while (loop)
             {
-                Console.WriteLine("-Menu-\n1. Tokeniser\n2. Shunting Yard\n3. Binary Evaluator\n4. Expression Evaluator\n5. Quit\n");
+                Console.WriteLine("\n-Menu-\n1. Tokeniser\n2. Shunting Yard\n3. Binary Evaluator\n4. Expression Evaluator\n5. Quit\n");
                 input = Console.ReadLine();
                 switch (input)
                 {
@@ -34,7 +34,11 @@ namespace project2
                         Console.WriteLine("Please enter expression");
                         input = Console.ReadLine();
                         tokeniser = new Tokeniser(input + '#');
-                        ; tokeniser.ShuntingYard();
+                        foreach (string[] i in tokeniser.ShuntingYard())
+                        {
+                            Console.Write(i[0] + " ");
+                        }
+                        
                         break;
                     case "3": //Binary Evaluator
 
@@ -130,21 +134,109 @@ namespace project2
                 return token;
             }
 
-            public List<string[]> GetAllTokens()
+            public Queue<string[]> GetAllTokens()
             {
-                List<string[]> Tokens = new List<string[]>();
-                do
+                Queue<string[]> tokens = new Queue<string[]>();
+                string[] token;
+                while ((token = NextToken())[0] != "#")
                 {
-                    Tokens.Add(NextToken());
-                } while (Tokens.Last()[0] != "#");
-                return Tokens;
+                    tokens.Enqueue(token);
+                } 
+                return tokens;
             }
-            public List<string[]> ShuntingYard()
+            public Queue<string[]> ShuntingYard()
             {
-                List<string[]> Tokens = GetAllTokens();
-                List<string[]> Tokens = GetAllTokens();
-                
+                Queue<string[]> tokens = GetAllTokens();
+                Queue<string[]> postfix = GetAllTokens();
+                Stack<string[]> stack = new Stack<string[]>();
+                string[] token;
+                string[] temp;
+                int tokenCount = tokens.Count;
+                for (int i = 0; i < tokenCount; i++)
+                {
+                    token = tokens.Dequeue();
+                    if (token[1] == "0") //If token is number
+                    {
+                        postfix.Enqueue(token);
+                    } else if (token[0] == "(")
+                    {
+                        stack.Push(token);
+                    } else if (token[0] == ")")
+                    {
+                        while ((temp = stack.Pop())[0] != "(") // Until opening bracket reached, empty stack into postfix
+                        {
+                            postfix.Enqueue(temp);
+                        }
+                        
+                    } else if (token[1] == "1")
+                    {
+                        if (stack.Count == 0)
+                        {
+                            stack.Push(token);
+                        } else
+                        {
+                            while (stack.Count > 0 && StackPriority(stack.Peek()[0]) >= IncomingPriority(token[0]))
+                            {
+                                postfix.Enqueue(stack.Pop());
+                            }
+                            stack.Push(token);
+                        }
 
+
+                    }
+                }
+
+                foreach (string[] i in stack) //When no tokens left, empty the stack into postfix
+                {
+                    postfix.Enqueue(i);
+                }
+                //still need to empty whatever is left of stack
+                return postfix;
+
+            }
+            public int IncomingPriority(string operate)
+            {
+                switch (operate)
+                {
+                    case "^":
+                        return 4;
+                        break;
+                    case "*":
+                        return 2;
+                        break;
+                    case "/":
+                        return 2;
+                        break;
+                    case "+":
+                        return 1;
+                        break;
+                    case "-":
+                        return 1;
+                        break;
+                }
+                return 0;
+            }
+            public int StackPriority(string operate)
+            {
+                switch (operate)
+                {
+                    case "^":
+                        return 3;
+                        break;
+                    case "*":
+                        return 2;
+                        break;
+                    case "/":
+                        return 2;
+                        break;
+                    case "+":
+                        return 1;
+                        break;
+                    case "-":
+                        return 1;
+                        break;
+                }
+                return 0;
             }
             public void SetExpression(string expression)
             {
