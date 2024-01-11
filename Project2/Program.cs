@@ -15,7 +15,7 @@ namespace project2
             Tokeniser tokeniser;
             while (loop)
             {
-                Console.WriteLine("\n-Menu-\n1. Tokeniser\n2. Shunting Yard\n3. Binary Evaluator\n4. Expression Evaluator\n5. Quit\n");
+                Console.WriteLine("\n-Menu-\n1. Tokeniser\n2. Shunting Yard\n3. Expression Evaluator\n4. Quit\n");
                 input = Console.ReadLine();
                 switch (input)
                 {
@@ -39,14 +39,15 @@ namespace project2
                             Console.Write(i[0] + " ");
                         }
                         
-                        break;
-                    case "3": //Binary Evaluator
+                        break;                        
 
+                    case "3": //Full Evaluator
+                        Console.WriteLine("Please enter expression");
+                        input = Console.ReadLine();
+                        tokeniser = new Tokeniser(input + '#');
+                        Console.WriteLine(tokeniser.ExpressionEvaluator());
                         break;
-                    case "4": //Full Evaluator
-
-                        break;
-                    case "5": // Quit
+                    case "4": // Quit
                         loop = false;
                         break;
 
@@ -58,40 +59,35 @@ namespace project2
 
         }
 
-        //Evaluates a single binary operation
-        public static int BinaryEval(string operand1, string operand2, string operation)
+        //Evaluates small expression of 2 operands and 1 operator
+        public static int BinaryEvaluator(int op1, int op2, string operate)
         {
             int result = 0;
-            int op1 = Convert.ToInt32(operand1);
-            int op2 = Convert.ToInt32(operand2);
 
-            if (operation == "^") 
+            switch (operate)
             {
-                result = op1;
-                for (int i = 1; i < op2; i++)
-                {
-                    result *= op1;
-                }
-
-            } else if (operation == "*")
-            {
-                result = op1 * op2 ;
+                case "^":
+                    result = (int)Math.Pow(op1, op2);
+                    break;
+                case "*":
+                    result = op1 * op2;
+                    break;
+                case "/":
+                    result = op1 / op2;
+                    break;
+                case "+":
+                    result = op1 + op2;
+                    break;
+                case "-":
+                    result = op1 - op2;
+                    break;
+                default:
+                    Console.WriteLine("Unrecognised operand");
+                    break;
             }
-            else if (operation == "/")
-            {
-                result = op1 / op2;
-            }
-            else if (operation == "+")
-            {
-                result = op1 + op2;
-            }
-            else if (operation == "-")
-            {
-                result = op1 - op2;
-            }
-
             return result;
         }
+
 
         public class Tokeniser
         {
@@ -193,6 +189,32 @@ namespace project2
                 //still need to empty whatever is left of stack
                 return postfix;
 
+            }
+
+            public int ExpressionEvaluator()
+            {
+                int operand1, operand2;
+                string[] token;
+
+                Queue<string[]> postfix = ShuntingYard();
+                Stack<int> stack = new Stack<int>();
+
+                int tokenCount = postfix.Count;
+
+                for (int i = 0; i < tokenCount; i++)
+                {
+                    token = postfix.Dequeue();
+                    if (token[1] == "0")
+                    {
+                        stack.Push(int.Parse(token[0]));
+                    } else {
+                        operand2 = stack.Pop();
+                        operand1 = stack.Pop();
+                        stack.Push(BinaryEvaluator(operand1, operand2, token[0]));
+                    }
+                }
+
+                return stack.Pop();
             }
             public int IncomingPriority(string operate)
             {
