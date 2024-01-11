@@ -4,26 +4,47 @@
     //https://inspirnathan.com/posts/155-handling-unary-operations-with-shunting-yard-algorithm/
     //unary operators are followed by a number, while subtraction could be separated by spaces
 
-
-    //Store tokens in list/array, not string, store the value and type e.g. operator/operand
-    //Infix expression will be in the format: operand , operator , operand, ...
-    //So then turn to postfix, then eval
-    //-2+2 1st is unary 2nd is binary, when you reach the second, it bust be binary becuase 2- -2+ is not valid.
     class Program
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Please enter expression:");
-            string expression = Console.ReadLine();
-            Tokeniser tokeniser = new Tokeniser(expression);
-
-            string token;         
-
-            do
+            bool loop = true;
+            string input;
+            Tokeniser tokeniser;
+            while (loop)
             {
-                token = tokeniser.NextToken();
-                Console.WriteLine(token);
-            } while (token != "#");
+                Console.WriteLine("-Menu-\n1. Tokeniser\n2. Shunting Yard\n3. Evaluator\n4. Quit\n");
+                input = Console.ReadLine();
+                switch (input)
+                {
+                    case "1": //Tokeniser Demo
+                        Console.WriteLine("Please enter expression");
+                        input = Console.ReadLine();
+                        tokeniser = new Tokeniser(input + '#');
+                        string[] token;
+                        do
+                        {
+                            token = tokeniser.NextToken();
+                            Console.WriteLine(token[0]);
+                        } while (token[0] != "#");
+                        break;
+                    case "2": //Shunting Yard
+
+                        break;
+                    case "3": //Binary Evaluator
+
+                        break;
+                    case "4": //Full Evaluator
+
+                        break;
+                    case "5": // Quit
+                        loop = false;
+                        break;
+
+                }
+            }
+
+
 
 
         }
@@ -74,39 +95,32 @@
             const string numbers = "1234567890";
             const string operators = "+-=*/^";
             const string singles = "()#"; //Holds single-char tokens, if any are found, return as token immediately
-            public string NextToken() //Returns the next operand/operator/bracket
+            public string[] NextToken() //Returns the next operand/operator/bracket
             {
-                string token = expression[pointer].ToString();
-                string tokenType = "";
 
-                //Skip spaces, this allows multi-digit postfix numbers by using spaces to separate them
-                while (token == " ") 
-                {
-                    token = expression[++pointer].ToString();
-                }           
+                string[] token = { "", "" };
+                string[] possibleTokens = { numbers, operators, singles};
+               
 
-                //If is a single-char token, like a bracket, return.
-                if (singles.Contains(token))
+                token[0] += expression[pointer];
+                if (possibleTokens[2].Contains(token[0]))
                 {
-                    pointer++;
+                    token[1] = "2";
                     return token;
                 }
-
+                if (possibleTokens[0].Contains(token[0]))
+                {
+                    token[1] = "0";
+                } else if (possibleTokens[1].Contains(token[0])) {
+                    token[1] = "1";
+                }
+                pointer++;
+                while (pointer < expression.Length && possibleTokens[int.Parse(token[1])].Contains(expression[pointer]))
+                {
+                    token[0] += expression[pointer];
+                    pointer++;
+                }
                 
-                if (numbers.Contains(token))
-                {
-                    tokenType = numbers;
-                } else if (operators.Contains(token))
-                {
-                    tokenType = operators;
-                }
-
-                //This allows for multi-char operands and operators, by joining adjacent operands/operators into a single token.
-                while (pointer < expression.Length - 1 && tokenType.Contains(expression[++pointer]))
-                {
-                    token += expression[pointer];
-                }
-
                 return token;
             }
 
