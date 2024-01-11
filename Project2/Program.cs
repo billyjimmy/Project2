@@ -2,9 +2,6 @@
 
 namespace project2
 {
-    //Note for unary operators
-    //https://inspirnathan.com/posts/155-handling-unary-operations-with-shunting-yard-algorithm/
-    //unary operators are followed by a number, while subtraction could be separated by spaces
 
     class Program
     {
@@ -177,8 +174,6 @@ namespace project2
                             }
                             stack.Push(token);
                         }
-
-
                     }
                 }
 
