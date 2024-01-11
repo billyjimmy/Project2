@@ -1,4 +1,6 @@
-﻿namespace project2
+﻿using static project2.Program;
+
+namespace project2
 {
     //Note for unary operators
     //https://inspirnathan.com/posts/155-handling-unary-operations-with-shunting-yard-algorithm/
@@ -13,7 +15,7 @@
             Tokeniser tokeniser;
             while (loop)
             {
-                Console.WriteLine("-Menu-\n1. Tokeniser\n2. Shunting Yard\n3. Evaluator\n4. Quit\n");
+                Console.WriteLine("-Menu-\n1. Tokeniser\n2. Shunting Yard\n3. Binary Evaluator\n4. Expression Evaluator\n5. Quit\n");
                 input = Console.ReadLine();
                 switch (input)
                 {
@@ -29,7 +31,10 @@
                         } while (token[0] != "#");
                         break;
                     case "2": //Shunting Yard
-
+                        Console.WriteLine("Please enter expression");
+                        input = Console.ReadLine();
+                        tokeniser = new Tokeniser(input + '#');
+                        ; tokeniser.ShuntingYard();
                         break;
                     case "3": //Binary Evaluator
 
@@ -92,17 +97,18 @@
             
             string expression;
             int pointer = 0;
-            const string numbers = "1234567890";
+            const string operands = "1234567890";
             const string operators = "+-=*/^";
-            const string singles = "()#"; //Holds single-char tokens, if any are found, return as token immediately
+            const string singles = "()#ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //Holds single-char tokens, if any are found, return as token immediately
             public string[] NextToken() //Returns the next operand/operator/bracket
             {
 
                 string[] token = { "", "" };
-                string[] possibleTokens = { numbers, operators, singles};
+                string[] possibleTokens = { operands, operators, singles};
                
 
                 token[0] += expression[pointer];
+                pointer++;
                 if (possibleTokens[2].Contains(token[0]))
                 {
                     token[1] = "2";
@@ -114,7 +120,7 @@
                 } else if (possibleTokens[1].Contains(token[0])) {
                     token[1] = "1";
                 }
-                pointer++;
+                
                 while (pointer < expression.Length && possibleTokens[int.Parse(token[1])].Contains(expression[pointer]))
                 {
                     token[0] += expression[pointer];
@@ -124,6 +130,22 @@
                 return token;
             }
 
+            public List<string[]> GetAllTokens()
+            {
+                List<string[]> Tokens = new List<string[]>();
+                do
+                {
+                    Tokens.Add(NextToken());
+                } while (Tokens.Last()[0] != "#");
+                return Tokens;
+            }
+            public List<string[]> ShuntingYard()
+            {
+                List<string[]> Tokens = GetAllTokens();
+                List<string[]> Tokens = GetAllTokens();
+                
+
+            }
             public void SetExpression(string expression)
             {
                 pointer = 0;
